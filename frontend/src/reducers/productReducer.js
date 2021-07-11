@@ -37,7 +37,7 @@ export const productDetailsReducer = (
     case PRODUCT_DETAILS_REQUEST:
       return {
         loading: true,
-        ...state,
+        product: { reviews: [] },
       }
     case PRODUCT_DETAILS_SUCCESS:
       return {
