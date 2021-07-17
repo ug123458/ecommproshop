@@ -1,18 +1,25 @@
-import React, { useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
+import axios from 'axios'
+import { PayPalButton } from 'react-paypal-button-v2'
 import { useDispatch, useSelector } from 'react-redux'
 import { Button, Row, Col, Card, Image, ListGroup } from 'react-bootstrap'
 import Message from './../components/Message'
 import { Link } from 'react-router-dom'
 import { getOrderDetails } from '../action/orderAction'
 import Loader from './../components/Loader'
+import { payOrder } from './../action/orderAction'
+import { ORDER_PAY_RESET } from '../constants/orderconstants'
 
 const OrderScreen = ({ match }) => {
   const orderId = match.params.id
-
+  const [sdkReady, setsdkReady] = useState(false)
   const dispatch = useDispatch()
 
   const orderDetails = useSelector((state) => state.orderDetails)
   const { error, loading, order } = orderDetails
+
+  const orderPay = useSelector((state) => state.orderPay)
+  const { loading: loadingPay, success: successPay } = orderPay
 
   if (!loading) {
     const addDecimals = (num) => {
@@ -26,10 +33,32 @@ const OrderScreen = ({ match }) => {
   }
 
   useEffect(() => {
-    if (!order || order._id !== orderId) {
-      dispatch(getOrderDetails(orderId))
+    const addPayPalScript = async () => {
+      const { data: ClientId } = await axios.get('/api/config/paypal')
+      const script = document.createElement('script')
+      script.type = 'text/javascript'
+      script.src = `https://www.paypal.com/sdk/js?client-id=${ClientId}`
+      script.async = true
+      script.onload = () => {
+        setsdkReady(true)
+      }
+      document.body.appendChild(script)
     }
-  }, [order, orderId, dispatch])
+
+    if (!order || order._id !== orderId || successPay) {
+      dispatch({ type: ORDER_PAY_RESET })
+      dispatch(getOrderDetails(orderId))
+    } else if (!window.paypal) {
+      addPayPalScript()
+    } else {
+      setsdkReady(true)
+    }
+  }, [order, orderId, dispatch, successPay])
+
+  const successPaymentHandler = (paymentResult) => {
+    console.log(paymentResult)
+    dispatch(payOrder(orderId, paymentResult))
+  }
 
   return loading ? (
     <Loader />
@@ -37,7 +66,7 @@ const OrderScreen = ({ match }) => {
     <Message variant='danger'>{error}</Message>
   ) : (
     <>
-      <h1>Order {order._id}</h1>
+      <h3>Order {order._id}</h3>
       <Row>
         <Col md={8}>
           <ListGroup variant='flush'>
@@ -72,7 +101,7 @@ const OrderScreen = ({ match }) => {
                 {order.paymentMethod}
               </p>
               {order.isPaid ? (
-                <Message variant='success'>Paid On {order.PaidAt}</Message>
+                <Message variant='success'>Paid On {order.paidAt}</Message>
               ) : (
                 <Message variant='danger'>Not Paid</Message>
               )}
@@ -140,6 +169,19 @@ const OrderScreen = ({ match }) => {
                   <Col>${order.totalPrice}</Col>
                 </Row>
               </ListGroup.Item>
+              {!order.isPaid && (
+                <ListGroup.Item>
+                  {loadingPay && <Loader />}
+                  {!sdkReady ? (
+                    <Loader />
+                  ) : (
+                    <PayPalButton
+                      amount={order.totalPrice}
+                      onSuccess={successPaymentHandler}
+                    />
+                  )}
+                </ListGroup.Item>
+              )}
             </ListGroup>
           </Card>
         </Col>
