@@ -1,11 +1,10 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Button, Row, Col, Card, Image, ListGroup } from 'react-bootstrap'
 import Checkoutsteps from '../components/Checkoutsteps'
 import Message from './../components/Message'
 import { Link } from 'react-router-dom'
 import { createOrder } from '../action/orderAction'
-import { CART_RESET_ITEM } from './../constants/cartconstants'
 
 const PlaceOrderScreen = ({ history }) => {
   const cart = useSelector((state) => state.cart)
@@ -29,7 +28,14 @@ const PlaceOrderScreen = ({ history }) => {
   )
 
   const orderCreate = useSelector((state) => state.orderCreate)
-  const { error, order } = orderCreate
+  const { error, order, success } = orderCreate
+
+  useEffect(() => {
+    if (success) {
+      history.push(`/orders/${order._id}`)
+    }
+    //eslint-disable-next-line
+  }, [history, success])
 
   const placeOrderHandler = () => {
     dispatch(
@@ -43,8 +49,6 @@ const PlaceOrderScreen = ({ history }) => {
         totalPrice: cart.totalPrice,
       })
     )
-    history.push(`/orders/${order._id}`)
-    dispatch({ type: CART_RESET_ITEM })
   }
 
   return (

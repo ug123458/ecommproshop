@@ -8,7 +8,11 @@ import { Link } from 'react-router-dom'
 import { getOrderDetails } from '../action/orderAction'
 import Loader from './../components/Loader'
 import { payOrder } from './../action/orderAction'
-import { ORDER_PAY_RESET } from '../constants/orderconstants'
+import {
+  ORDER_CREATE_RESET,
+  ORDER_PAY_RESET,
+} from '../constants/orderconstants'
+import { CART_RESET_ITEM } from './../constants/cartconstants'
 
 const OrderScreen = ({ match }) => {
   const orderId = match.params.id
@@ -46,7 +50,10 @@ const OrderScreen = ({ match }) => {
     }
 
     if (!order || order._id !== orderId || successPay) {
+      dispatch({ type: ORDER_CREATE_RESET })
+      dispatch({ type: CART_RESET_ITEM })
       dispatch({ type: ORDER_PAY_RESET })
+
       dispatch(getOrderDetails(orderId))
     } else if (!window.paypal) {
       addPayPalScript()
