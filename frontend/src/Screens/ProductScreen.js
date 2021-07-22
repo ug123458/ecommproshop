@@ -6,6 +6,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { listProductsDetails } from '../action/productAction'
 import Loader from '../components/Loader'
 import Message from '../components/Message'
+import { PRODUCT_DETAILS_RESET } from '../constants/productconstants'
 const ProductScreen = ({ history, match }) => {
   const [qty, setqty] = useState(1)
 
@@ -16,6 +17,7 @@ const ProductScreen = ({ history, match }) => {
   const { loading, error, product } = productDetails
 
   useEffect(() => {
+    dispatch({ type: PRODUCT_DETAILS_RESET })
     dispatch(listProductsDetails(match.params.id))
   }, [dispatch, match])
 
