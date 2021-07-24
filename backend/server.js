@@ -1,5 +1,6 @@
 import path from 'path'
 import express from 'express'
+import morgan from 'morgan'
 import dotenv from 'dotenv'
 import connectDB from './config/db.js'
 import productRoute from './routes/productRoute.js'
@@ -8,6 +9,11 @@ import orderRoutes from './routes/orderRoutes.js'
 import uploadRoutes from './routes/uploadRoutes.js'
 import { notfound, errorhandler } from './middleware/errormiddleware.js'
 const app = express()
+
+if (process.env.NODE_ENV === 'devlopment') {
+  app.use(morgan('dev'))
+}
+
 app.use(express.json())
 
 dotenv.config()
