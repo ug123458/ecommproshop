@@ -27,8 +27,9 @@ const Head = () => {
             <Navbar.Brand>Proshop</Navbar.Brand>
           </LinkContainer>
           <Navbar.Toggle aria-controls='basic-navbar-nav' />
-          <Route render={({ history }) => <Searchbox history={history} />} />
+
           <Navbar.Collapse id='basic-navbar-nav'>
+            <Route render={({ history }) => <Searchbox history={history} />} />
             <Nav className='ml-auto'>
               <LinkContainer to='/cart'>
                 <Nav.Link>
