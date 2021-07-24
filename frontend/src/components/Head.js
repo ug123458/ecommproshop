@@ -4,6 +4,8 @@ import { Navbar, Nav, Container, NavDropdown } from 'react-bootstrap'
 import { useSelector, useDispatch } from 'react-redux'
 import { logout } from '../action/userActions'
 import { useHistory } from 'react-router-dom'
+import Searchbox from './Searchbox'
+import { Route } from 'react-router-dom'
 
 const Head = () => {
   const dispatch = useDispatch()
@@ -25,6 +27,7 @@ const Head = () => {
             <Navbar.Brand>Proshop</Navbar.Brand>
           </LinkContainer>
           <Navbar.Toggle aria-controls='basic-navbar-nav' />
+          <Route render={({ history }) => <Searchbox history={history} />} />
           <Navbar.Collapse id='basic-navbar-nav'>
             <Nav className='ml-auto'>
               <LinkContainer to='/cart'>
