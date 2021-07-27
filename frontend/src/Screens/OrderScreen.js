@@ -109,7 +109,7 @@ const OrderScreen = ({ match }) => {
               </p>
               {order.isDelivered ? (
                 <Message variant='success'>
-                  Delivered On {order.deliveredAt}
+                  Delivered On {Date(order.deliveredAt).substring(0, 15)}
                 </Message>
               ) : (
                 <Message variant='danger'>Not Delivered</Message>
@@ -122,7 +122,9 @@ const OrderScreen = ({ match }) => {
                 {order.paymentMethod}
               </p>
               {order.isPaid ? (
-                <Message variant='success'>Paid On {order.paidAt}</Message>
+                <Message variant='success'>
+                  Paid On {Date(order.paidAt).substring(0, 15)}
+                </Message>
               ) : (
                 <Message variant='danger'>Not Paid</Message>
               )}
